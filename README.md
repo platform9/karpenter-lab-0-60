@@ -144,7 +144,7 @@ terraform apply
 After the apply is successful, you should be able to see the test workload running in the `workshop` namespace with kubectl:
 
 ```
-kubectl get pods -n workshop
+kubectl get pods -n karpenter-lab
 ```
 
 ### Lab 2: Install and configure Karpenter
