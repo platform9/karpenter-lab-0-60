@@ -45,7 +45,7 @@ provider "helm" {
 
 locals {
   deployment_date = formatdate("YYYY-MM-DD", timestamp())
-  add_tolerations = true
+  add_tolerations = false
   tolerations = local.add_tolerations ? [ "karpenter-lab" ] : []
 }
 
