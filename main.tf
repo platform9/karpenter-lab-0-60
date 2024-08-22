@@ -118,8 +118,11 @@ module "eks_karpenter" {
   version = "20.20.0"
   cluster_name = var.eks_cluster_name
   iam_policy_use_name_prefix = false
+  iam_policy_name = "karpenter-${var.eks_cluster_name}"
   iam_role_use_name_prefix = false
+  iam_role_name = "karpenter-${var.eks_cluster_name}"
   node_iam_role_use_name_prefix = false
+  node_iam_role_name = "karpenter-${var.eks_cluster_name}-node"
   enable_pod_identity = true
   create_pod_identity_association = true
   tags = {
