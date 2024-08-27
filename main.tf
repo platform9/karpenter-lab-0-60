@@ -25,6 +25,11 @@ data "aws_eks_cluster" "karpenter_lab" {
   name = var.eks_cluster_name
 }
 
+data "aws_eks_node_group" "karpenter_lab" {
+  cluster_name = data.aws_eks_cluster.karpenter_lab.name
+  node_group_name = "${data.aws_eks_cluster.karpenter_lab.name}-nodegroup"
+}
+
 data "aws_eks_cluster_auth" "karpenter_lab" {
   name = var.eks_cluster_name
 }
@@ -107,6 +112,13 @@ resource "kubernetes_deployment_v1" "test_workload" {
 
 # Lab 2, first apply
 /*
+resource "aws_ec2_tag" "karpenter_subnet_tag" {
+  for_each = data.aws_eks_node_group.karpenter_lab.subnet_ids
+  resource_id = each.key
+  key = "karpenter.sh/discovery"
+  value = "karpenter-lab"
+}
+
 resource "aws_eks_addon" "identity-agent" {
   cluster_name = var.eks_cluster_name
   addon_name = "eks-pod-identity-agent"
@@ -118,8 +130,11 @@ module "eks_karpenter" {
   version = "20.20.0"
   cluster_name = var.eks_cluster_name
   iam_policy_use_name_prefix = false
+  iam_policy_name = "karpenter-${var.eks_cluster_name}"
   iam_role_use_name_prefix = false
+  iam_role_name = "karpenter-${var.eks_cluster_name}"
   node_iam_role_use_name_prefix = false
+  node_iam_role_name = "karpenter-${var.eks_cluster_name}-node"
   enable_pod_identity = true
   create_pod_identity_association = true
   tags = {
