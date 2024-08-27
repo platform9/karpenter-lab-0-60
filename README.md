@@ -110,7 +110,10 @@ terraform init
 
 This should download and install all the Terraform providers that will be used later in the lab.
 
-Lastly, rename the `lab.tfvars` file to `terraform.tfvars` and edit it to set the workshop variables for your assigned cluster name, your cluster's AWS region, and the owner string that will be used for some resource tags (note: use only alphanumeric characters in the value of the `owner` variable or some applies later may fail).
+Lastly, rename the `lab.tfvars` file to `terraform.tfvars` and edit it to set the workshop variables for your assigned cluster name, your cluster's AWS region, and the owner string that will be used for some resource tags.
+
+> [!NOTE]
+> Use only alphanumeric characters in the value of the `owner` variable or some applies later may fail.
 
 At this point you should be able to run a plan without errors:
 
@@ -189,7 +192,9 @@ Now list the pods in the `karpenter-lab` namespace:
 kubectl get po -n karpenter-lab
 ```
 
-At least one should show as Pending.  Note that the Pending pods do not (yet) trigger Karpenter to scale the cluster, so they don't ever get scheduled.  This is because our NodeClass applies a taint to the nodes it creates, and the test workload does not currently tolerate that taint.
+At least one should show as Pending.
+
+Note that the Pending pods do not (yet) trigger Karpenter to scale the cluster, so they don't ever get scheduled.  This is because our NodeClass applies a taint to the nodes it creates, and the test workload does not currently tolerate that taint.
 
 To enable the taint, look in the `locals` stanza.  There is a local value called `add_tolerations` which is set to `false`.  Set this to `true` -- this will cause a dynamic `toleration` block that tolerates the NodePool-applied taint to be created next time you apply the Terraform config.  Now plan and apply.
 
