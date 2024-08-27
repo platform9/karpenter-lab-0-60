@@ -153,11 +153,15 @@ kubectl get pods -n karpenter-lab
 
 As noted in the discussion portion of the workshop, while the Karpenter project publishes infrastructure configuration artifacts as CloudFormation and Terraform configuration is capable of representing the same resources, there's no 100% reliable translator from CloudFormation to Terraform config.  For this part of the lab we'll use a copy of the Karpenter sub-module from the community-maintained `terraform-aws-modules` GitHub project, since the maintainer has already done the work of creating native Terraform equivalents of the CloudFormation resource definitions.
 
-Uncomment the `resource "aws_eks_addon" "identity-agent"` and `module "eks_karpenter"` stanzas in `main.tf`, run `terraform init`, then plan and apply.
+Uncomment the `resource "aws_eks_addon" "identity-agent"` and `module "eks_karpenter"` stanzas in `main.tf`.
+
+Because you just enabled a new module that Terraform hasn't initialized yet, you'll need to run `terraform init` again, then you can plan and apply.
 
 This will create the resources Karpenter needs but doesn't (yet) install Karpenter itself.  (The apply may take a few minutes because it creates some new infrastructure like an Amazon SQS queue.)
 
-Once the first apply completes successfully, you can install the Karpenter Helm chart with Terraform.  Uncomment the `resource "helm_release" "karpenter_crd"` and `resource "helm_release" "karpenter"` stanzas in `main.tf`, then plan and apply.  If this is successful, you should be able to monitor the status of the helm chart install with the helm CLI:
+Once the first apply completes successfully, you can install the Karpenter Helm chart with Terraform.  Uncomment the `resource "helm_release" "karpenter_crd"` and `resource "helm_release" "karpenter"` stanzas in `main.tf`, then plan and apply.
+
+If this is successful, you should be able to monitor the status of the helm chart install with the helm CLI:
 
 ```
 helm status -n kube-system karpenter
@@ -167,7 +171,9 @@ Once the install completes, you'll be ready to move on.
 
 #### Create a Karpenter EC2NodeClass and NodeGroup
 
-Uncomment the `resource "kubernetes_manifest" "karpenter_nodeclass"` and `resource "kubernetes_manifest" "karpenter_nodepool"` stanzas in `main.tf`, then plan and apply.  This finally will create the NodeClass and NodePool that Karpenter will use to handle scaling.
+Uncomment the `resource "kubernetes_manifest" "karpenter_nodeclass"` and `resource "kubernetes_manifest" "karpenter_nodepool"` stanzas in `main.tf`, then plan and apply.
+
+This finally will create the NodeClass and NodePool that Karpenter will use to handle scaling.
 
 #### Scale up the test workload to observe autoscaling
 
@@ -185,7 +191,7 @@ kubectl get po -n karpenter-lab
 
 At least one should show as Pending.  Note that the Pending pods do not (yet) trigger Karpenter to scale the cluster, so they don't ever get scheduled.  This is because our NodeClass applies a taint to the nodes it creates, and the test workload does not currently tolerate that taint.
 
-To enable the taint, look in the `locals` stanza.  There is a local value called `add_tolerations` which is set to `false`.  Set this to `true` -- this will cause a dynamic `toleration` block that tolerates the NodePool-applied taint to be created next time you apply the Terraform config.  Then plan and apply.
+To enable the taint, look in the `locals` stanza.  There is a local value called `add_tolerations` which is set to `false`.  Set this to `true` -- this will cause a dynamic `toleration` block that tolerates the NodePool-applied taint to be created next time you apply the Terraform config.  Now plan and apply.
 
 Wait a minute or so and list the cluster nodes:
 
@@ -213,7 +219,9 @@ Wait a minute or so and list the nodes again as above.  You should see that the 
 
 #### Update Karpenter
 
-One of the variables passed in to the Terraform config for the Karpenter Helm charts is the version of Karpenter to install.  At the start of the lab, it's set to `0.36.1`.  Upgrade it to `0.37.0` by either changing the default value in `variables.tf`, or adding a new variable declaration to your `terraform.tfvars` file.  Plan and apply, then repeat the scale-up/scale-down exercise from the previous lab to verify Karpenter is still working.
+One of the variables passed in to the Terraform config for the Karpenter Helm charts is the version of Karpenter to install.  At the start of the lab, it's set to `0.36.1`.  Upgrade Karpenter to `0.37.0` by either changing the default value in `variables.tf`, or adding a new variable declaration to your `terraform.tfvars` file, then plan and apply.
+
+Now, repeat the scale-up/scale-down exercise from the previous lab to verify Karpenter is still working.
 
 #### Experiment with your EC2NodeClass and NodePool
 
