@@ -204,7 +204,12 @@ Wait a minute or so and list the cluster nodes:
 kubectl get nodes
 ```
 
-You should see a new node appear in the list (if not, keep trying a few more times, but it shouldn't take longer than a minute or two from the time your apply succeeds).  After the node appears, your pods should quickly all show as Running:
+You should see a new node appear in the list (if not, keep trying a few more times, but it shouldn't take longer than a minute or two from the time your apply succeeds).
+
+> [!NOTE]
+> Since the update of the test workload causes a new version of the Deployment to roll out, you may notice more than one new node appear while the old pods are still in the Terminating state.  Karpenter will consolidate this down to one new node when the Terminating pods are finally gone.
+
+After the node appears, your pods should quickly all show as Running:
 
 ```
 kubectl get po -n karpenter-lab
