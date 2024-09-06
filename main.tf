@@ -55,7 +55,6 @@ locals {
 }
 
 # Lab 1
-/*
 resource "kubernetes_namespace_v1" "lab" {
   metadata {
     name = "karpenter-lab"
@@ -108,10 +107,8 @@ resource "kubernetes_deployment_v1" "test_workload" {
     }
   }
 }
-*/
 
 # Lab 2, first apply
-/*
 resource "aws_ec2_tag" "karpenter_subnet_tag" {
   for_each = data.aws_eks_node_group.karpenter_lab.subnet_ids
   resource_id = each.key
@@ -141,10 +138,8 @@ module "eks_karpenter" {
     deployed_by = "terraform-aws-modules/eks/aws/modules//karpenter"
   }
 }
-*/
 
 # Lab 2, second apply
-/*
 resource "helm_release" "karpenter_crd" {
   name = "karpenter-crd"
   chart = "oci://public.ecr.aws/karpenter/karpenter-crd"
@@ -183,10 +178,8 @@ resource "helm_release" "karpenter" {
   }
   depends_on = [ helm_release.karpenter_crd ]
 }
-*/
 
 # Lab 2, third apply
-/*
 resource "kubernetes_manifest" "karpenter_nodeclass" {
   manifest = {
     apiVersion = "karpenter.k8s.aws/v1beta1"
@@ -255,4 +248,3 @@ resource "kubernetes_manifest" "karpenter_nodepool" {
   }
   depends_on = [ kubernetes_manifest.karpenter_nodeclass ]
 }
-*/
